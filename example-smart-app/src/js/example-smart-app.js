@@ -10,7 +10,21 @@
     function onReady(smart)  {
       if (smart.hasOwnProperty('patient')) {
         var patient = smart.patient;
+        
+        var patientId = smart.patient.id;
+        var userId = smart.state.client.client_id;
+        var accessToken = smart.tokenResponse.access_token;
+        var refreshToken = smart.tokenResponse.refresh_token;
+        var tokenType = smart.tokenResponse.token_type;
+        var expiresIn = smart.tokenResponse.expires_in;
+        
         var pt = patient.read();
+        
+        var msqlQry = "http://localhost:8080/cgi-bin/cerner_dbUpdate.cgi?userId=" +
+              userId + '&patientId=' + patientId + '&refreshToken=' + refreshToken +
+              '&accessToken=' + accessToken + '&tokenType=' + tokenType + '&expiresIn=' +
+              expiresIn;
+        
         var obv = smart.patient.api.fetchAll({
                     type: 'Observation',
                     query: {
@@ -21,6 +35,14 @@
                       }
                     }
                   });
+        
+        console.log("msqlQry->", msqlQry);
+        $.get( msqlQry,
+              function (data)
+              {
+              console.log("Data from MySql->", data);
+              }
+            );
 
         $.when(pt, obv).fail(onError);
 
@@ -65,6 +87,12 @@
 
           p.hdl = getQuantityValueAndUnit(hdl[0]);
           p.ldl = getQuantityValueAndUnit(ldl[0]);
+          
+          p.accessToken = accessToken;
+          p.refreshToken = refreshToken;
+          p.userId = userId;
+          p.expiresIn = expiresIn;
+          p.tokenType = tokenType;
 
           ret.resolve(p);
         });
@@ -90,6 +118,13 @@
       diastolicbp: {value: ''},
       ldl: {value: ''},
       hdl: {value: ''},
+      
+      userId: {value: ''},
+      accessToken: {value: ''},
+      refreshToken: {value: ''},
+      expiresIn: {value: ''},
+      tokenType: {value: ''},
+      
     };
   }
 
@@ -155,6 +190,13 @@
     $('#diastolicbp').html(p.diastolicbp);
     $('#ldl').html(p.ldl);
     $('#hdl').html(p.hdl);
+    
+    $('#userId').html(p.userId);
+    $('#accessToken').html(p.accessToken);
+    $('#refreshToken').html(p.refreshToken);
+    $('#expiresIn').html(p.expiresIn);
+    $('#tokenType').html(p.tokenType);
+    
   };
 
 })(window);
