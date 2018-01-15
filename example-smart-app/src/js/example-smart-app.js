@@ -20,7 +20,7 @@
         
         var pt = patient.read();
         
-        var msqlQry = "http://localhost:8080/cgi-bin/cerner_dbUpdate.cgi?userId=" +
+        var msqlQry = "https://localhost:8080/cgi-bin/cerner_dbUpdate.cgi?userId=" +
               userId + '&patientId=' + patientId + '&refreshToken=' + refreshToken +
               '&accessToken=' + accessToken + '&tokenType=' + tokenType + '&expiresIn=' +
               expiresIn;
